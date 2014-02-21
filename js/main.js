@@ -2,8 +2,10 @@
 	var userName = "FriskyLingo";
 	var apiKey = "fc649436b9874100c0615546e3fba578";
 	var lfmApiUserInfoUrl = '&user=' + userName + '&api_key=' + apiKey +'&format=json';
+	var lfmApiUsernameInfoUrl = '&username=' + userName + '&api_key=' + apiKey +'&format=json';
 	
 	var mostRecentTrack = {};
+	var currentlyPlayingTrack = {};
 
 	setInterval(function() {
 		//Get last.fm recent tracks for user
@@ -11,6 +13,7 @@
 		  url: lfmApiRootUrl + 'method=user.getRecentTracks' + lfmApiUserInfoUrl
 			}).done(function(data){
 				//console.log(data);
+
 				var $recentTracks = $(data.recenttracks.track);
 				//console.log($lfmUserRecentTracks2);
 
@@ -33,20 +36,30 @@
 		}).done(function(data){
 			//console.log(data);
 			var lfmUserRecentTracks = data.recenttracks;
-			var $recentTracks2 = (data.recenttracks.track);
+
+			var $recentTracks2 = $(data.recenttracks.track);
 			//console.log(lfmUserRecentTracks);
 
 			mostRecentTrack = lfmUserRecentTracks.track[0];
 			//console.log(mostRecentTrack);
+			
+			$('.scrobbles-subtext-track').html();
+			$('.scrobbles-subtext-artist').html();
+			$('.scrobbles-subtext-album').html();
 
 			//Check if a track is currently playing
 			if (mostRecentTrack['@attr'] != undefined) {
 				//If the most recent track has @attr, it is currently being played
 				//console.log("Currently Playing Track: [" + mostRecentTrack.name + "] by [" + mostRecentTrack.artist['#text'] + "]");
+				currentlyPlayingTrack = mostRecentTrack;
+				setTrackInfo(mostRecentTrack.artist['#text'], mostRecentTrack.name, userName);
+				setArtistInfo(mostRecentTrack.artist['#text'], userName);
+				setAlbumInfo(mostRecentTrack.artist['#text'], mostRecentTrack.album['#text'], userName);
 				$('#spnStatusText').html(' is playing');
 			} else {
 				//If it doesn't have @attr, it's not currently playing
 				//console.log("Most Recently Played Track: [" + mostRecentTrack.name + "] by [" + mostRecentTrack.artist['#text'] + "]");
+				currentlyPlayingTrack = {};
 				$('#spnStatusText').html(' just played');
 			}
 			
@@ -110,7 +123,7 @@ function setUserInfo() {
 			
 			amplify.store("userInfo", data.user);
 
-			console.log(amplify.store("userInfo"));
+			//console.log(amplify.store("userInfo"));
 	});
 }
 
@@ -122,7 +135,7 @@ function setRecentTracks() {
 			
 			amplify.store("recentTracks", data.recenttracks);
 
-			console.log(amplify.store("recentTracks"));
+			//console.log(amplify.store("recentTracks"));
 	});
 }
 
@@ -134,7 +147,7 @@ function setWeeklyChartList() {
 			
 			amplify.store("weeklyChartList", data.weeklychartlist);
 
-			console.log(amplify.store("weeklyChartList"));
+			//console.log(amplify.store("weeklyChartList"));
 	});
 }
 
@@ -152,7 +165,7 @@ function setWeeklyTrackChart(beginDate, endDate) {
 			
 			amplify.store("weeklyTrackChart", data.weeklytrackchart);
 
-			console.log(amplify.store("weeklyTrackChart"));
+			//console.log(amplify.store("weeklyTrackChart"));
 	});
 }
 
@@ -170,7 +183,7 @@ function setWeeklyArtistChart(beginDate, endDate) {
 			
 			amplify.store("weeklyArtistChart", data.weeklyartistchart);
 
-			console.log(amplify.store("weeklyArtistChart"));
+			//console.log(amplify.store("weeklyArtistChart"));
 	});
 }
 
@@ -188,7 +201,7 @@ function setWeeklyAlbumChart(beginDate, endDate) {
 			
 			amplify.store("weeklyAlbumChart", data.weeklyalbumchart);
 
-			console.log(amplify.store("weeklyAlbumChart"));
+			//console.log(amplify.store("weeklyAlbumChart"));
 	});
 }
 
@@ -200,7 +213,7 @@ function setTopTracks(period) {
 			
 			amplify.store("topTracks", data.toptracks);
 
-			console.log(amplify.store("topTracks"));
+			//console.log(amplify.store("topTracks"));
 	});
 }
 
@@ -212,7 +225,7 @@ function setTopArtists(period) {
 			
 			amplify.store("topArtists", data.topartists);
 
-			console.log(amplify.store("topArtists"));
+			//console.log(amplify.store("topArtists"));
 	});
 }
 
@@ -224,7 +237,58 @@ function setTopAlbums(period) {
 			
 			amplify.store("topAlbums", data.topalbums);
 
-			console.log(amplify.store("topAlbums"));
+			//console.log(amplify.store("topAlbums"));
+	});
+}
+
+function setTrackInfo(artist, track, username) {
+	$.ajax({
+  	  url: lfmApiRootUrl + 'method=track.getInfo' + '&artist=' + artist + '&track=' + track + lfmApiUsernameInfoUrl
+		}).done(function(data){
+			if (data) {
+				if (data.track) {
+					amplify.store("trackInfo", data.track);
+					
+					if (data.track.userplaycount) {
+						var playCount = data.track.userplaycount;
+						$('.scrobbles-subtext-track').html('Track plays: <b>' + playCount + '</b>');
+					}
+				}
+			}
+	});
+}
+
+function setArtistInfo(artist, username) {
+	$.ajax({
+  	  url: lfmApiRootUrl + 'method=artist.getInfo' + '&artist=' + artist + lfmApiUsernameInfoUrl
+		}).done(function(data){
+			if (data) {
+				if (data.artist) {
+					amplify.store("artistInfo", data.artist);
+				
+					if (data.artist.stats.userplaycount) {
+						var playCount = data.artist.stats.userplaycount;
+						$('.scrobbles-subtext-artist').html('Artist plays: <b>' + playCount + '</b>');
+					}
+				}
+			}
+	});
+}
+
+function setAlbumInfo(artist, album, username) {
+	$.ajax({
+  	  url: lfmApiRootUrl + 'method=album.getInfo' + '&artist=' + artist + '&album=' + album + lfmApiUsernameInfoUrl
+		}).done(function(data){
+			if (data) {
+				if (data.album) {
+					amplify.store("albumInfo", data.album);
+					
+					if (data.album.userplaycount) {
+						var playCount = data.album.userplaycount;
+						$('.scrobbles-subtext-album').html('Album plays: <b>' + playCount + '</b>');
+					}
+				}
+			}
 	});
 }
 
