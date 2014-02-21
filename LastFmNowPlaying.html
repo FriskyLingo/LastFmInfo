@@ -43,7 +43,33 @@
       <script src="http://cdn.last.fm/javascript/javascript/230502/lib/html5shiv.js"></script>
       <![endif]-->
 		  
-      <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+      
+	  <!-- load jquery ui css theme -->
+	      <!--<link type="text/css" href="css/jquery-ui.css" rel="stylesheet" />-->
+
+	      <!-- load the sDashboard css -->
+	      <!--<link href="css/sDashboard.css" rel="stylesheet">-->
+
+	      <!-- load jquery library -->
+	      <!--<script src="libs/jquery/jquery-1.8.2.js" type="text/javascript"></script>-->
+		  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+	      <!-- load jquery ui library -->
+	      <!--<script src="libs/jquery/jquery-ui.js" type="text/javascript"></script>-->
+
+	      <!-- load datatables library -->
+	      <!--<script src="libs/datatables/jquery.dataTables.js"></script>-->
+
+	      <!-- load flot charting library -->
+	      <!--<script src="libs/flotr2/flotr2.js" type="text/javascript"></script>-->
+
+	      <!-- load sDashboard library -->
+	      <!--<script src="js/jquery-sDashboard.js" type="text/javascript"></script>-->
+		  
+		  <link type="text/css" rel="stylesheet" href="../rickshaw.min.css">
+		  <script src="js/d3.min.js"></script>
+		<script src="js/d3.layout.min.js"></script>
+		<script src="js/rickshaw.min.js"></script>
    </head>
    <!--[if lt IE 7 ]> 
    <body class="r-user a-now lang-en theme-whittle ie ie6">
@@ -90,118 +116,21 @@
                                           <div class="artist-name">
                                              <a href="http://www.last.fm/user/FriskyLingo" class="inherit"></a>
                                           </div>
+										  
+										  <ul id="myDashboard"></ul>
+										  
                                        </div>
                                     </div>
                                  </div>
                               </div>
+							  <div id="chart"></div>
                            </div>
                         </div>
                      </div>
                   </div>
-					  <script>
-						var lfmApiRootUrl = "http://ws.audioscrobbler.com/2.0/?";
-						var userName = "FriskyLingo";
-						var apiKey = "fc649436b9874100c0615546e3fba578";
-						var lfmApiUserInfoUrl = '&user=' + userName + '&api_key=' + apiKey +'&format=json';
-
-						var mostRecentTrack = {};
-
-						setInterval(function() {
-	  						//Get last.fm recent tracks for user
-	  						jQuery.ajax({
-	  						  url: lfmApiRootUrl + 'method=user.getRecentTracks' + lfmApiUserInfoUrl
-	  							}).done(function(data){
-	  								//console.log(data);
-	  								var lfmUserRecentTracks2 = data.recenttracks;
-	  								//console.log(lfmUserRecentTracks);
-		
-	  								var mostRecentTrack2 = lfmUserRecentTracks2.track[0];
-									//console.log(mostRecentTrack);
-									//console.log(mostRecentTrack2);
-									
-									if (mostRecentTrack2.name != mostRecentTrack.name) {
-										//console.log("most recent track changed!");
-										updateNowPlaying.onReady();
-									}
-								});
-						}, 5000);
-
-						//Get last.fm recent tracks for user
-						var updateNowPlaying = {
-							onReady: function () {
-						jQuery.ajax({
-						  url: lfmApiRootUrl + 'method=user.getRecentTracks' + lfmApiUserInfoUrl
-							}).done(function(data){
-								//console.log(data);
-								var lfmUserRecentTracks = data.recenttracks;
-								//console.log(lfmUserRecentTracks);
-		
-								mostRecentTrack = lfmUserRecentTracks.track[0];
-								//console.log(mostRecentTrack);
-		
-								//Check if a track is currently playing
-								if (mostRecentTrack['@attr'] != undefined) {
-									//If the most recent track has @attr, it is currently being played
-									//console.log("Currently Playing Track: [" + mostRecentTrack.name + "] by [" + mostRecentTrack.artist['#text'] + "]");
-									jQuery('#spnStatusText').html(' is playing');
-								} else {
-									//If it doesn't have @attr, it's not currently playing
-									//console.log("Most Recently Played Track: [" + mostRecentTrack.name + "] by [" + mostRecentTrack.artist['#text'] + "]");
-									jQuery('#spnStatusText').html(' just played');
-								}
-								
-								
-								
-								jQuery('.track-name')
-									.text(mostRecentTrack.name)
-									.attr('href', mostRecentTrack.url);
-									
-								jQuery('.artwork')
-									.attr('href', mostRecentTrack.url);
-
-								var artistInfo = {}; 
-
-								jQuery.ajax({
-							  	  url: lfmApiRootUrl + 'method=artist.getInfo&artist=' + mostRecentTrack.artist['#text'] + lfmApiUserInfoUrl
-									}).done(function(data){
-										//console.log(data.artist);
-										artistInfo = data.artist;
-										jQuery('.artist-name a')
-											.text(mostRecentTrack.artist['#text'])
-											.attr('href', data.artist.url);
-											
-											var imageUrl = "";
-											var maxImageCount = 0;
-								
-											if (mostRecentTrack.album['#text'] != "") {
-												//If the track DOES have an album, use the ALBUM artwork
-												jQuery.ajax({
-											  	  url: lfmApiRootUrl + 'method=album.getInfo&artist=' + mostRecentTrack.artist['#text'] + '&album=' + mostRecentTrack.album['#text'] + lfmApiUserInfoUrl
-													}).done(function(data){
-														//console.log(data.album);
-											
-														maxImageCount = mostRecentTrack.image.length - 1;
-														imageUrl = mostRecentTrack.image[maxImageCount]['#text'];
-											
-														//console.log(imageUrl);
-											
-														jQuery('.art').css('background-image', 'url(' + imageUrl + ')');
-														jQuery('.main-art').attr('src', imageUrl).attr('alt','Artwork for ' + mostRecentTrack.name);
-												});
-											} else {
-												//If the track DOES NOT have an album, use ARTIST artwork
-												maxImageCount = artistInfo.image.length - 1;
-												
-												imageUrl = artistInfo.image[maxImageCount]['#text'];
-												jQuery('.art').css('background-image', 'url(' + imageUrl + ')');
-												jQuery('.main-art').attr('src', imageUrl).attr('alt','Artwork for ' + mostRecentTrack.name);
-											}
-								});
-							});
-						}
-					};
-					
-					updateNowPlaying.onReady();
-					  </script>
+				  
+				  
+	<script src="libs/amplify.min.js" type="text/javascript"></script>
+	<script src="js/main.js" type="text/javascript"></script>
    </body>
 </html>
