@@ -21,46 +21,9 @@
 				if (mostRecentTrack2.name != mostRecentTrack.name) {
 					//console.log("most recent track changed!");
 					updateNowPlaying.onReady();
-					recentlyPlayed.update($recentTracks);
 				}
-				//recentlyPlayed.update($recentTracks);
 			});
 	}, 5000);
-	
-	var recentlyPlayed = {
-		onReady: function () {
-			console.log("onready");
-			
-			$.ajax({
-			  url: lfmApiRootUrl + 'method=user.getRecentTracks' + lfmApiUserInfoUrl
-			}).done(function(data){
-				var $recentTracks = $(data.recenttracks.track);
-				$("#myDashboard").empty();
-			
-				$recentTracks.each(function(){
-					//console.log($(this)[0]);
-					
-					var trackName = $(this)[0].name;
-					var trackArtist = $(this)[0].artist['#text']
-					var trackPlayDate = $(this)[0].date['#text'];
-					
-					$("#myDashboard").append('<li><span>' + trackName + ' <i>by</i> ' + trackArtist + ' <i>(played at ' + trackPlayDate + ')</i></span></li>');
-				});
-			});
-		},
-		update: function ($recentTracks) {
-			//console.log("update");
-			$("#myDashboard").empty();
-			
-			$recentTracks.each(function(){
-				var trackName = $(this)[0].name;
-				var trackArtist = $(this)[0].artist['#text']
-				var trackPlayDate = $(this)[0].date['#text'];
-				
-				$("#myDashboard").append('<li><span>' + trackName + ' <i>by</i> ' + trackArtist + ' <i>(played at ' + trackPlayDate + ')</i></span></li>');
-			});
-		}
-	}
 
 	//Get last.fm recent tracks for user
 	var updateNowPlaying = {
@@ -250,76 +213,6 @@ function setTopArtists(period) {
 			amplify.store("topArtists", data.topartists);
 
 			console.log(amplify.store("topArtists"));
-			
-			var $artists = $(data.topartists.artist);
-			var graphData = [];
-			var graphData2 = [];
-			$artists.each(function (index, artist){
-				console.log(artist);
-				graphData.push({x: index, y: Math.floor(artist.playcount)});
-				graphData2.push([Math.floor(artist.playcount), index]);
-			});
-			
-			//console.log(graphData);
-			
-			var graph = new Rickshaw.Graph({
-				element: document.querySelector("#chart"),
-				renderer: 'bar',
-				series: [{
-					data: graphData,
-					color: 'steelblue'
-				}]
-			});
-			
-			var xAxis = new Rickshaw.Graph.Axis.X({
-				graph: graph
-			});
-
-			xAxis.render();
-			
-			var yAxis = new Rickshaw.Graph.Axis.Y({
-				graph: graph
-			});
-
-			yAxis.render();
-			
-			var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-				graph: graph
-			} );
-			 
-			graph.render();
-			
-			
-			
-			
-			
-			var data2 = [
-			['Heavy Industry', 12],['Retail', 9], ['Light Industry', 14], 
-			['Out of home', 16],['Commuting', 7], ['Orientation', 9]
-		  ];
-		  var plot1 = $.jqplot ('chartdiv', [graphData2], 
-			{ 
-			  seriesDefaults: {
-					renderer:$.jqplot.BarRenderer,
-					// Show point labels to the right ('e'ast) of each bar.
-					// edgeTolerance of -15 allows labels flow outside the grid
-					// up to 15 pixels.  If they flow out more than that, they 
-					// will be hidden.
-					pointLabels: { show: true, location: 'e', edgeTolerance: -15 },
-					// Rotate the bar shadow as if bar is lit from top right.
-					shadowAngle: 135,
-					// Here's where we tell the chart it is oriented horizontally.
-					rendererOptions: {
-						barDirection: 'horizontal'
-					}
-				},
-				axes: {
-					yaxis: {
-						renderer: $.jqplot.CategoryAxisRenderer
-					}
-				}
-			}
-		  );
 	});
 }
 
@@ -338,11 +231,9 @@ function setTopAlbums(period) {
 
 $(document).ready(function(){
 	updateNowPlaying.onReady();
-	recentlyPlayed.onReady();
 	setUserInfo();
 	setRecentTracks();
 	setWeeklyChartList();
-	//setWeeklyTrackChart();
 	setTopTracks('overall');
 	setTopArtists('overall');
 	setTopAlbums('overall');
