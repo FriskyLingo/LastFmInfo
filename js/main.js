@@ -292,6 +292,43 @@ function setAlbumInfo(artist, album, username) {
 	});
 }
 
+function getLibraryTracks() {
+	$.ajax({
+  	  url: lfmApiRootUrl + 'method=library.getTracks' + '&user=FriskyLingo' + lfmApiUsernameInfoUrl
+		}).done(function(data){
+            if (data) {
+                    if (data.tracks){
+                        var totalNumberOfPages = data.tracks['@attr'].totalPages;
+                        
+                        for (i = totalNumberOfPages; i >= 1; i--) {
+                            //console.log('Processing page [' + i + '] of [' + totalNumberOfPages + ']');
+                            
+                            $.ajax({
+                                  url: lfmApiRootUrl + 'method=library.getTracks' + '&user=FriskyLingo' + '&page=' + i + lfmApiUsernameInfoUrl
+                                    }).done(function(data2){
+                                        if (data2) {
+                                                if (data2.tracks){
+                                                    var $tracks = $(data2.tracks.track);
+                                                    
+                                                    var artist, name, album, playCount;
+
+                                                    $tracks.each(function () {
+                                                        artist = $(this)[0].artist.name;
+                                                        name = $(this)[0].name;
+                                                        album = $(this)[0].album.name;
+                                                        playCount = $(this)[0].playcount;
+                                                        
+                                                        console.log(name + "|" + artist + "|" + album +  "|" + playCount);
+                                                    });
+                                                }
+                                        }
+                                });
+                        }
+                    }
+            }
+	});
+}
+
 
 $(document).ready(function(){
 	updateNowPlaying.onReady();
@@ -301,6 +338,7 @@ $(document).ready(function(){
 	setTopTracks('overall');
 	setTopArtists('overall');
 	setTopAlbums('overall');
+    //getLibraryTracks();
 });
 
 
