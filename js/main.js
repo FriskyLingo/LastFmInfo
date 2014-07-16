@@ -334,10 +334,10 @@ $(document).ready(function(){
 	updateNowPlaying.onReady();
 	setUserInfo();
 	setRecentTracks();
-	setWeeklyChartList();
-	setTopTracks('overall');
-	setTopArtists('overall');
-	setTopAlbums('overall');
+	//setWeeklyChartList();
+	//setTopTracks('overall');
+	//setTopArtists('overall');
+	//setTopAlbums('overall');
     //getLibraryTracks();
 });
 
