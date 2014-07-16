@@ -268,9 +268,13 @@ function setArtistInfo(artist, username) {
 				
 					if (data.artist.stats.userplaycount) {
 						var playCount = data.artist.stats.userplaycount;
-						$('.scrobbles-subtext-artist').html('Artist plays: <b>' + playCount + '</b>');
+						$('.scrobbles-subtext-artist').html('<a href="http://www.last.fm/user/FriskyLingo/library/music/' + artist + '?sortBy=plays&sortOrder=desc" class="inherit">Artist plays: <b>' + playCount + '</b></a>');
 					}
 				}
+                else {
+                    amplify.store("artistInfo", "");
+                    $('.scrobbles-subtext-artist').html();
+                }
 			}
 	});
 }
@@ -285,9 +289,13 @@ function setAlbumInfo(artist, album, username) {
 					
 					if (data.album.userplaycount) {
 						var playCount = data.album.userplaycount;
-						$('.scrobbles-subtext-album').html('Album plays: <b>' + playCount + '</b>');
+						$('.scrobbles-subtext-album').html('<a href="http://www.last.fm/user/FriskyLingo/library/music/' + artist + '/' + album + '?sortBy=plays&sortOrder=desc" class="inherit">Album plays: <b>' + playCount + '</b></a>');
 					}
 				}
+                else {
+                    amplify.store("albumInfo", "");
+                    $('.scrobbles-subtext-album').html();
+                }
 			}
 	});
 }
