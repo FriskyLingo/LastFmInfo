@@ -252,9 +252,13 @@ function setTrackInfo(artist, track, username) {
 					
 					if (data.track.userplaycount) {
 						var playCount = data.track.userplaycount;
-						$('.scrobbles-subtext-track').html('Track plays: <b>' + playCount + '</b>');
+						$('.scrobbles-subtext-track').html('<a href="http://www.last.fm/user/FriskyLingo/library/music/' + artist + '/_/' + track + '" class="inherit">Track plays: <b>' + playCount + '</b></a>');
 					}
 				}
+                else {
+                    amplify.store("trackInfo", "");
+                    $('.scrobbles-subtext-track').html();
+                }
 			}
 	});
 }
