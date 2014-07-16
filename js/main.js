@@ -60,7 +60,36 @@
 				//If it doesn't have @attr, it's not currently playing
 				//console.log("Most Recently Played Track: [" + mostRecentTrack.name + "] by [" + mostRecentTrack.artist['#text'] + "]");
 				currentlyPlayingTrack = {};
-				$('#spnStatusText').html(' just played');
+                
+				$('#spnStatusText').html(' last played');
+                
+                var currentTime = Math.round((new Date().getTime()) / 1000);
+                var lastListenedTime = mostRecentTrack.date.uts;
+                var howManyMinutesAgo = Math.round((currentTime - lastListenedTime) / 60);
+                
+                var howLongAgo = '';
+                
+                if (howManyMinutesAgo > 59) {
+                    var howManyHoursAgo = Math.round(howManyMinutesAgo / 60);
+                    
+                    if (howManyHoursAgo > 23) {
+                        var howManyDaysAgo = Math.round(howManyHoursAgo / 24);
+                        
+                        howLongAgo = howManyDaysAgo + ' days ago';
+                    }
+                    else {
+                        howLongAgo = howManyHoursAgo + ' hours ago';
+                    }
+                }
+                else {
+                    howLongAgo = howManyMinutesAgo + ' minutes ago';
+                }
+                
+                if (howLongAgo.substring(0,2) == '1 ') {
+                    howLongAgo = howLongAgo.replace('s','');
+                }
+                
+                $('.scrobbles-subtext-track').html('<a href="http://www.last.fm/user/FriskyLingo/tracks?view=compact&page=1" class="inherit">' + howLongAgo + '</a>');
 			}
 			
 			
