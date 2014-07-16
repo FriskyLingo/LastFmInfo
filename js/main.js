@@ -95,6 +95,7 @@
 						
 									maxImageCount = mostRecentTrack.image.length - 1;
 									imageUrl = mostRecentTrack.image[maxImageCount]['#text'];
+                                    imageUrl = imageUrl.replace('300x300','500');
 						
 									//console.log(imageUrl);
 						
